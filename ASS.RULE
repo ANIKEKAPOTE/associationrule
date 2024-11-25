@@ -1,0 +1,57 @@
+#LOADING LIBRARIES
+
+import mlxtend
+import pandas as pd
+from mlxtend.frequent_patterns import apriori,association_rules
+from mlxtend.preprocessing import TransactionEncoder
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+#LOADING DATADSET
+
+retail = pd.read_excel("D:\DS\Online retail.xlsx")
+retail.head()
+
+retail.info()
+
+retail.describe()
+
+retail.value_counts()
+
+retail.shape
+
+items = (retail['shrimp,almonds,avocado,vegetables mix,green grapes,whole weat flour,yams,cottage cheese,energy drink,tomato juice,low fat yogurt,green tea,honey,salad,mineral water,salmon,antioxydant juice,frozen smoothie,spinach,olive oil'].unique())
+items
+
+#DATA PREPROCESSING
+
+# One-hot encoding
+encoded_vals = []
+for index, row in retail.iterrows(): # iterrows() returns index and content for each row
+    labels = {}
+    uncommons = list(set(items) - set(row))
+    commons = list(set(items).intersection(row))# common items
+    for uc in uncommons:
+        labels[uc] = 0 # assign 0 to uncommon items
+    for com in commons:
+        labels[com] = 1# assign 1 to common items
+    encoded_vals.append(labels)
+
+encoded_vals
+
+ohe_df = pd.DataFrame(encoded_vals)
+
+ohe_df
+
+Association Rule Mining:
+
+freq_items = apriori(ohe_df, min_support = 0.00045, use_colnames = True)
+
+freq_items
+
+asso_rules=association_rules(freq_items, metric = "confidence", min_threshold = 0.6)
+
+asso_rules
+
+asso_rules.sort_values('confidence',ascending = False)
